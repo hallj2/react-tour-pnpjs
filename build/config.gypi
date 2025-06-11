@@ -6,8 +6,8 @@
     "defines": [],
     "include_dirs": [],
     "libraries": [],
-    "msbuild_toolset": "v142",
-    "msvs_windows_target_platform_version": "10.0.19041.0"
+    "msbuild_toolset": "v143",
+    "msvs_windows_target_platform_version": "10.0.26100.0"
   },
   "variables": {
     "asan": 0,
@@ -379,6 +379,6 @@
     "nodedir": "C:\\Users\\hallj2\\AppData\\Local\\node-gyp\\Cache\\16.20.2",
     "python": "C:\\Program Files\\Python313\\python.exe",
     "standalone_static_library": 1,
-    "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe"
+    "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe"
   }
 }

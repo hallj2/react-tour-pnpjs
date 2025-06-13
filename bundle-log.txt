@@ -1,0 +1,49 @@
+Build target: SHIP
+Found config file: serve.json
+Found config file: deploy-azure-storage.json
+Found config file: package-solution.json
+[13:38:47] Using gulpfile ~\source\repos\GitHub\react-tour-pnpjs\gulpfile.js
+[13:38:47] Starting 'bundle'...
+[[90m13:38:47[39m] Starting gulp
+[[90m13:38:47[39m] Starting subtask '[36mpre-copy[39m'...
+[[90m13:38:47[39m] Finished subtask '[36mpre-copy[39m' after [35m51 ms[39m
+[[90m13:38:47[39m] Starting subtask '[36mcopy-static-assets[39m'...
+[[90m13:38:47[39m] Starting subtask '[36msass[39m'...
+[[90m13:38:47[39m] Finished subtask '[36msass[39m' after [35m475 ms[39m
+[[90m13:38:47[39m] Starting subtask '[36mlint[39m'...
+[[90m13:38:47[39m] [[36mlint[39m] Examining C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\tsconfig.json
+[[90m13:38:47[39m] [[36mlint[39m] Found tsconfig.extends property ./node_modules/@microsoft/rush-stack-compiler-4.5/includes/tsconfig-web.json. It appears to be a relative path. Resolved to C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\node_modules\@microsoft\rush-stack-compiler-4.5\includes\tsconfig-web.json
+[[90m13:38:47[39m] [[36mlint[39m] Examining C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\node_modules\@microsoft\rush-stack-compiler-4.5\includes\tsconfig-web.json
+[[90m13:38:47[39m] [[36mlint[39m] Found tsconfig.extends property ./tsconfig-base.json. It appears to be a relative path. Resolved to C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\node_modules\@microsoft\rush-stack-compiler-4.5\includes\tsconfig-base.json
+[[90m13:38:47[39m] [[36mlint[39m] Examining C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\node_modules\@microsoft\rush-stack-compiler-4.5\includes\tsconfig-base.json
+[[90m13:38:47[39m] [[36mlint[39m] Found rush-stack compiler at C:\Users\hallj2\source\repos\GitHub\react-tour-pnpjs\node_modules\@microsoft\rush-stack-compiler-4.5/
+[[90m13:38:47[39m] Finished subtask '[36mlint[39m' after [35m70 ms[39m
+[[90m13:38:47[39m] Starting subtask '[36mtsc[39m'...
+[[90m13:38:47[39m] [[36mtsc[39m] typescript version: 4.5.5
+[[90m13:38:47[39m] Finished subtask '[36mcopy-static-assets[39m' after [35m605 ms[39m
+[[90m13:38:51[39m] Finished subtask '[36mtsc[39m' after [35m3.7 s[39m
+[[90m13:38:51[39m] Starting subtask '[36mpost-copy[39m'...
+[[90m13:38:51[39m] Finished subtask '[36mpost-copy[39m' after [35m224 ╬╝s[39m
+[[90m13:38:51[39m] Starting subtask '[36mconfigure-webpack[39m'...
+[[90m13:38:51[39m] [[36mconfigure-webpack[39m] Found config file: config.json
+[[90m13:38:53[39m] [[36mconfigure-webpack[39m] 1 entries specified.
+[[90m13:38:53[39m] [[36mconfigure-webpack[39m] 21 externals specified.
+[[90m13:38:53[39m] Finished subtask '[36mconfigure-webpack[39m' after [35m1.82 s[39m
+[[90m13:38:53[39m] Starting subtask '[36mwebpack[39m'...
+[[90m13:39:01[39m] [[36mconfigure-webpack[39m] 2 localized resources defined.
+[[90m13:39:01[39m] [[36mconfigure-webpack[39m] Found file "lib/webparts/tour/loc/en-us.js", identified as locale "en-us"
+[[90m13:39:01[39m] [31mError - [[36mwebpack[31m] Error processing webpack stats: TypeError: Cannot read properties of undefined (reading 'toJson')[39m
+[[90m13:39:01[39m] [31mError - [[36mwebpack[31m] Webpack error: TypeError: Cannot set properties of undefined (setting 'asyncChunks')[39m
+[[90m13:39:01[39m] Finished subtask '[36mwebpack[39m' after [35m8.38 s[39m
+[13:39:01] Finished 'bundle' after 15 s
+[[90m13:39:02[39m] [35m==================[ Finished ]==================[39m
+Error - [webpack] Error processing webpack stats: TypeError: Cannot read properties of undefined (reading 'toJson')
+Error - [webpack] Webpack error: TypeError: Cannot set properties of undefined (setting 'asyncChunks')
+[[90m13:39:02[39m] [33mSuppressing[39m - Warning - [sass] The local CSS class 'ms-Grid' is not camelCase and will not be type-safe.
+[[90m13:39:02[39m] Project react-tour-pnpjs version:[33m0.0.1[39m
+[[90m13:39:02[39m] Build tools version:[33m3.18.0[39m
+[[90m13:39:02[39m] Node version:[33mv16.20.2[39m
+[[90m13:39:02[39m] Total duration:[33m19 s[39m
+[[90m13:39:02[39m] Task errors:[31m2[39m
+Exiting with exit code: 1
+The build failed because a task wrote output to stderr.

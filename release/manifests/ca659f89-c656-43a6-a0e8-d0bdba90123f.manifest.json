@@ -1,0 +1,82 @@
+{
+  "id": "ca659f89-c656-43a6-a0e8-d0bdba90123f",
+  "alias": "TourWebPart",
+  "componentType": "WebPart",
+  "version": "0.0.1",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": [
+    "SharePointWebPart"
+  ],
+  "preconfiguredEntries": [
+    {
+      "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+      "group": {
+        "default": "Other"
+      },
+      "title": {
+        "default": "Tour - Tutorial WebPart"
+      },
+      "description": {
+        "default": "Start page tutorial to discover all the features"
+      },
+      "officeFabricIconFontName": "HintText",
+      "properties": {
+        "actionValue": "Start page tour",
+        "description": "Start page tutorial to discover all the features."
+      }
+    }
+  ],
+  "loaderConfig": {
+    "internalModuleBaseUrls": [
+      "<!-- PATH TO CDN -->"
+    ],
+    "entryModuleId": "tour-web-part",
+    "scriptResources": {
+      "tour-web-part": {
+        "type": "path",
+        "path": "tour-web-part_a962cac3a8db718031e1.js"
+      },
+      "react": {
+        "type": "component",
+        "id": "0d910c1c-13b9-4e1c-9aa4-b008c5e42d7d",
+        "version": "16.14.0"
+      },
+      "react-dom": {
+        "type": "component",
+        "id": "aa0a46ec-1505-43cd-a44a-93f3a5aa460a",
+        "version": "16.14.0"
+      },
+      "@microsoft/sp-core-library": {
+        "type": "component",
+        "id": "7263c7d0-1d6a-45ec-8d85-d4d1d234171b",
+        "version": "1.21.1"
+      },
+      "@microsoft/sp-webpart-base": {
+        "type": "component",
+        "id": "974a7777-0990-4136-8fa6-95d80114c2e0",
+        "version": "1.21.1"
+      },
+      "TourWebPartStrings": {
+        "type": "path",
+        "path": "TourWebPartStrings_en-us_386a6a9b21fb6b0ab57ce823dabae27f.js"
+      },
+      "PropertyControlStrings": {
+        "type": "localizedPath",
+        "paths": {
+          "en-US": "PropertyControlStrings_en-us_d2ae862d7916e621d6f3fd5e59169c5b.js",
+          "fr-FR": "PropertyControlStrings_fr-fr_085941e745ec55d3efd4df07280386c8.js",
+          "nl-NL": "PropertyControlStrings_nl-nl_c6dca0fbcf9a40cea525fe995d3f1637.js",
+          "ru-RU": "PropertyControlStrings_ru-ru_6a082b7e6de8ae89a46ef40e7df219ed.js",
+          "zh-CN": "PropertyControlStrings_zh-cn_dac40ed027fbb4854bac67324e78e0b8.js"
+        },
+        "defaultPath": "PropertyControlStrings_en-us_d2ae862d7916e621d6f3fd5e59169c5b.js"
+      },
+      "@microsoft/sp-lodash-subset": {
+        "type": "component",
+        "id": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
+        "version": "1.9.1"
+      }
+    }
+  }
+}

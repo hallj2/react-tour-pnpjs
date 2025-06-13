@@ -1,4 +1,4 @@
-@import '~office-ui-fabric-react/dist/sass/References.scss';
+@use 'office-ui-fabric-react/dist/sass/References.scss' as *;
 
 .reactTourCustomCss {
   --reactour-accent: #5cb7b7 !important;

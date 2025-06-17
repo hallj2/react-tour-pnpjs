@@ -490,6 +490,16 @@
     "nodedir": "C:\\Users\\hallj2\\AppData\\Local\\node-gyp\\Cache\\22.16.0",
     "python": "C:\\Program Files\\Python313\\python.exe",
     "standalone_static_library": 1,
-    "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe"
+    "msbuild_path": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin\\MSBuild.exe",
+    "cache": "C:\\Users\\hallj2\\AppData\\Local\\npm-cache",
+    "globalconfig": "C:\\Users\\hallj2\\AppData\\Roaming\\npm\\etc\\npmrc",
+    "global_prefix": "C:\\Users\\hallj2\\AppData\\Roaming\\npm",
+    "init_module": "C:\\Users\\hallj2\\.npm-init.js",
+    "local_prefix": "C:\\Users\\hallj2\\source\\repos\\GitHub\\react-tour-pnpjs",
+    "node_gyp": "C:\\Users\\hallj2\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js",
+    "npm_version": "11.4.2",
+    "prefix": "C:\\Users\\hallj2\\AppData\\Roaming\\npm",
+    "userconfig": "C:\\Users\\hallj2\\.npmrc",
+    "user_agent": "npm/11.4.2 node/v22.16.0 win32 x64 workspaces/false"
   }
 }

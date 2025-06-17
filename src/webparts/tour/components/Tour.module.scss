@@ -1,5 +1,4 @@
-@use 'office-ui-fabric-react/dist/sass/References.scss' as *;
-
+@import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
 .reactTourCustomCss {
   --reactour-accent: #5cb7b7 !important;
   line-height: 1.3 !important;

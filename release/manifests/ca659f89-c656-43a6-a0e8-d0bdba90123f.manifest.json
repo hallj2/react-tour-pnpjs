@@ -35,17 +35,17 @@
     "scriptResources": {
       "tour-web-part": {
         "type": "path",
-        "path": "tour-web-part_a962cac3a8db718031e1.js"
+        "path": "tour-web-part_2ebdb4ff618c9a1ff104.js"
       },
       "react": {
         "type": "component",
         "id": "0d910c1c-13b9-4e1c-9aa4-b008c5e42d7d",
-        "version": "16.14.0"
+        "version": "17.0.1"
       },
       "react-dom": {
         "type": "component",
         "id": "aa0a46ec-1505-43cd-a44a-93f3a5aa460a",
-        "version": "16.14.0"
+        "version": "17.0.1"
       },
       "@microsoft/sp-core-library": {
         "type": "component",
@@ -75,7 +75,7 @@
       "@microsoft/sp-lodash-subset": {
         "type": "component",
         "id": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
-        "version": "1.9.1"
+        "version": "1.21.1"
       }
     }
   }

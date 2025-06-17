@@ -5,13 +5,13 @@
         {
           "componentId": "0d910c1c-13b9-4e1c-9aa4-b008c5e42d7d",
           "componentName": "react",
-          "componentVersion": "16.14.0",
+          "componentVersion": "17.0.1",
           "isDirectDependency": true
         },
         {
           "componentId": "aa0a46ec-1505-43cd-a44a-93f3a5aa460a",
           "componentName": "react-dom",
-          "componentVersion": "16.14.0",
+          "componentVersion": "17.0.1",
           "isDirectDependency": true
         },
         {
@@ -47,6 +47,12 @@
         {
           "componentId": "78359e4b-07c2-43c6-8d0b-d060b4d577e8",
           "componentName": "@microsoft/sp-diagnostics",
+          "componentVersion": "1.21.1",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
+          "componentName": "@microsoft/sp-lodash-subset",
           "componentVersion": "1.21.1",
           "isDirectDependency": false
         },
@@ -109,18 +115,6 @@
           "componentName": "@ms/sp-edit-customer-promise",
           "componentVersion": "0.1.0",
           "isDirectDependency": false
-        },
-        {
-          "componentId": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
-          "componentName": "@microsoft/sp-lodash-subset",
-          "componentVersion": "1.21.1",
-          "isDirectDependency": false
-        },
-        {
-          "componentId": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
-          "componentName": "@microsoft/sp-lodash-subset",
-          "componentVersion": "1.9.1",
-          "isDirectDependency": true
         }
       ],
       "asyncChunks": {}

@@ -6,8 +6,6 @@ import { CompoundButton } from 'office-ui-fabric-react';
 import { TourHelper } from './TourHelper';
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
-
-
 export interface ITourState {
   isTourOpen: boolean;
   steps: any[];
@@ -15,7 +13,6 @@ export interface ITourState {
 }
 
 export default class Tour extends React.Component<ITourProps, ITourState> {
-
   constructor(props: ITourProps) {
     super(props);
     this.state = {
@@ -26,32 +23,46 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
   }
 
   public componentDidMount() {
-    this.setState({ steps: TourHelper.getTourSteps(this.props.collectionData) });
-    if (this.props.collectionData != undefined && this.props.collectionData.length > 0) {
-      this.setState({ tourDisabled: false });
+    this.initializeTourWithRetry();
+  }
+
+  public componentDidUpdate(prevProps: ITourProps) {
+    if (JSON.stringify(this.props.collectionData) !== JSON.stringify(prevProps.collectionData)) {
+      this.initializeTourWithRetry();
     }
   }
 
-  public componentDidUpdate(newProps) {
-    if (JSON.stringify(this.props.collectionData) != JSON.stringify(newProps.collectionData)) {
-      this.setState({ steps: TourHelper.getTourSteps(this.props.collectionData) });
-      if (this.props.collectionData != undefined && this.props.collectionData.length > 0) {
-        this.setState({ tourDisabled: false });
-      } else {
-        this.setState({ tourDisabled: true });
-      }
+  private initializeTourWithRetry(attempt: number = 0) {
+    const MAX_ATTEMPTS = 5;
+    const DELAY_MS = 500;
+
+    const steps = TourHelper.getTourSteps(this.props.collectionData);
+    const allSelectorsExist = steps.every(
+      step => !!step.selector && document.querySelector(step.selector)
+    );
+
+    if ((steps.length > 0 && allSelectorsExist) || attempt >= MAX_ATTEMPTS) {
+      this.setState({
+        steps: steps,
+        tourDisabled: steps.length === 0 || !allSelectorsExist
+      });
+    } else {
+      setTimeout(() => this.initializeTourWithRetry(attempt + 1), DELAY_MS);
     }
   }
-
 
   public render(): React.ReactElement<ITourState> {
     return (
       <div className={styles.tour}>
-        <CompoundButton primary text={this.props.actionValue} secondaryText={this.props.description}
-          disabled={this.state.tourDisabled} onClick={this._openTour} checked={this.state.isTourOpen}
-          className={styles.tutorialButton}>
-
-      </CompoundButton>
+        <CompoundButton
+          primary
+          text={this.props.actionValue}
+          secondaryText={this.props.description}
+          disabled={this.state.tourDisabled}
+          onClick={this._openTour}
+          checked={this.state.isTourOpen}
+          className={styles.tutorialButton}
+        />
         <Tours
           onRequestClose={this._closeTour}
           startAt={0}
@@ -79,3 +90,6 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     this.setState({ isTourOpen: true });
   }
 }
+
+
+

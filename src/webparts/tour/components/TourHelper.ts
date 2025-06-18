@@ -1,30 +1,29 @@
-import {
-  sp
-} from "@pnp/sp";
-import { graph } from "@pnp/graph";
-
-
-
-
 export class TourHelper {
-
   public static getTourSteps(settings: any[]): any[] {
+    const result: any[] = [];
 
-    var result: any[] = new Array<any>();
-
-    if (settings != undefined) {
+    if (settings && settings.length > 0) {
       settings.forEach(ele => {
         if (ele.Enabled) {
-          result.push(
-            {
-              selector: '[data-sp-feature-instance-id=\'' + ele.WebPart + '\']',
+          const selector = `[data-sp-feature-instance-id='${ele.WebPart}']`;
+          const targetExists = typeof document !== "undefined" && document.querySelector(selector);
+
+          if (targetExists) {
+            result.push({
+              id: ele.id,
+              selector: selector,
               content: ele.StepDescription
             });
+          } else {
+            console.warn(`Tour step skipped: No DOM element found for selector ${selector}`);
+          }
         }
       });
-
     }
+
     return result;
   }
-
 }
+
+
+

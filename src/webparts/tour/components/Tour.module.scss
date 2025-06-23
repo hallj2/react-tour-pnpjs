@@ -93,4 +93,10 @@
       display: inline-block;
     }
   }
+
+  .tour-highlight-preview {
+    outline: 3px solid gold !important;
+    outline-offset: -3px;
+    transition: outline 0.2s ease;
+  }
 }

@@ -5,9 +5,10 @@ import Tours from 'reactour';
 import { CompoundButton } from 'office-ui-fabric-react';
 import { TourHelper } from './TourHelper';
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
+import introJs from 'intro.js';
+import 'intro.js/introjs.css';
 
 export interface ITourState {
-  isTourOpen: boolean;
   steps: any[];
   tourDisabled: boolean;
 }
@@ -16,7 +17,6 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
   constructor(props: ITourProps) {
     super(props);
     this.state = {
-      isTourOpen: false,
       steps: [],
       tourDisabled: true
     };
@@ -60,14 +60,12 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
           secondaryText={this.props.description}
           disabled={this.state.tourDisabled}
           onClick={this._openTour}
-          checked={this.state.isTourOpen}
           className={styles.tutorialButton}
         />
         <Tours
           onRequestClose={this._closeTour}
           startAt={0}
           steps={this.state.steps}
-          isOpen={this.state.isTourOpen}
           maskClassName="mask"
           className={styles.reactTourCustomCss}
           accentColor={"#5cb7b7"}
@@ -83,11 +81,19 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
   private _enableBody = target => enableBodyScroll(target);
 
   private _closeTour = () => {
-    this.setState({ isTourOpen: false });
+    introJs().exit(true);
   }
 
   private _openTour = () => {
-    this.setState({ isTourOpen: true });
+    console.log("introjs tour started");
+    if (this.state.steps && this.state.steps.length > 0) {
+      introJs().setOptions({
+        steps: this.state.steps.map(step => ({
+          element: step.selector, // css element selector
+          intro: step.content //tooltip text
+        }))
+      }).start();
+    }
   }
 }
 

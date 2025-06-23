@@ -2,30 +2,29 @@ import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { Version } from '@microsoft/sp-core-library';
 import {
-  BaseClientSideWebPart,
-  PropertyPaneTextField
+  BaseClientSideWebPart
 } from '@microsoft/sp-webpart-base';
+
 
 import * as strings from 'TourWebPartStrings';
 import Tour from './components/Tour';
 import { ITourProps } from './components/ITourProps';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import { sp, ClientSidePage, ClientSideWebpart, IClientControlEmphasis } from '@pnp/sp';
-import { IPropertyPaneConfiguration } from '@microsoft/sp-property-pane';
+import { IPropertyPaneConfiguration, IPropertyPaneDropdownOption, PropertyPaneTextField } from '@microsoft/sp-property-pane';
 
 export interface ITourWebPartProps {
   actionValue: string;
   description: string;
   collectionData: any[];
   steps: any[];
-
 }
-
 
 export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps> {
 
   private loadIndicator: boolean = true;
   private webpartList: any[] = new Array<any[]>();
+  private _webPartOptions: IPropertyPaneDropdownOption[] = [];
 
   public onInit(): Promise<void> {
 
@@ -35,8 +34,6 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       });
     });
   }
-
-
 
   public render(): void {
     const element: React.ReactElement<ITourProps> = React.createElement(
@@ -59,10 +56,19 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
     return Version.parse('1.0');
   }
 
-  public async GetAllWebpart(): Promise<any[]> {
-    // page file
-    const file = sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
+  private highlightWebPart = (instanceId: string): void => {
+    const element = document.querySelector(`[data-sp-feature-instance-id='${instanceId}']`);
+    if (!element) return;
 
+    element.classList.add("tour-highlight-preview");
+
+    setTimeout(() => {
+      element.classList.remove("tour-highlight-preview");
+    }, 2000);
+  };
+
+  public async GetAllWebpart(): Promise<any[]> {
+    const file = sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
     const page = await ClientSidePage.fromFile(file);
 
     const wpData: any[] = [];
@@ -70,21 +76,39 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
     page.sections.forEach(section => {
       section.columns.forEach(column => {
         column.controls.forEach(control => {
-          if (control.data.webPartData != undefined) {
-            wpData.push({
-              text: `sec[${section.order}] col[${column.order}] - ${control.data.webPartData.title}`,
-              key: control.data.webPartData.instanceId
-            });
-          } else {
-            wpData.push({
-              text: `sec[${section.order}] col[${column.order}] - "Webpart"`,
-              key: control.data.id
-            });
-          }
-        });
+          let title = "";
+          let instanceId = control.data.webPartData?.instanceId ?? control.data.id;
+          let labelPrefix = `sec[${section.order}] col[${column.order}]`;
 
+          if (control.data.webPartData) {
+            title = control.data.webPartData.title ?? "(untitled)";
+          } else {
+            title = "Webpart";
+          }
+
+          // Attempt to read preview text from rendered DOM
+          let previewText = "";
+          const domEl = document.querySelector(`[data-sp-feature-instance-id='${instanceId}']`);
+
+          if (domEl) {
+            const heading = domEl.querySelector('h1,h2,h3,h4,h5,.ms-webpart-titleText');
+            if (heading?.textContent) {
+              previewText = heading.textContent.trim();
+            } else {
+              // fallback: trim and sanitize general content
+              const rawText = domEl.textContent?.trim().replace(/\s+/g, " ") ?? "";
+              previewText = rawText.substring(0, 60) + (rawText.length > 60 ? "…" : "");
+            }
+          }
+
+          wpData.push({
+            key: instanceId,
+            text: `${labelPrefix} - ${title}${previewText ? ` (${previewText})` : ""}`
+          });
+        });
       });
     });
+
     return wpData;
   }
 
@@ -118,6 +142,8 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
     ...item
   }));
 
+  const webPartOptions = this._webPartOptions ?? [];
+
   return {
     pages: [
       {
@@ -144,7 +170,19 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
                   {
                     id: "WebPart",
                     title: "section[x] column[y] - WebPart Title",
-                    type: CustomCollectionFieldType.dropdown,
+                    type: CustomCollectionFieldType.custom,
+                    onCustomRender: (field, value, onUpdate, item, itemId) => {
+                      return React.createElement("select", {
+                        value: value,
+                        onChange: (e) => onUpdate(field.id, e.currentTarget.value),
+                        onMouseOver: (e) => {
+                          const instanceId = (e.target as HTMLSelectElement).value;
+                          this.highlightWebPart(instanceId);
+                        },
+                        style: {width: "300px"}
+                      },
+                    this.)
+                    }
                     options: this.webpartList,
                     required: true,
                   },
@@ -157,7 +195,7 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
                         React.createElement("div", null,
                           React.createElement("textarea",
                             {
-                              style: { width: "600px", height: "100px" },
+                              style: { width: "100%", height: "60px" },
                               placeholder: "Step description",
                               key: itemId,
                               value: value,

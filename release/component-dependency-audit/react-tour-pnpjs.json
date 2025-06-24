@@ -115,6 +115,84 @@
           "componentName": "@ms/sp-edit-customer-promise",
           "componentVersion": "0.1.0",
           "isDirectDependency": false
+        },
+        {
+          "componentId": "f9e737b7-f0df-4597-ba8c-3060f82380db",
+          "componentName": "@microsoft/sp-property-pane",
+          "componentVersion": "1.21.1",
+          "isDirectDependency": true
+        },
+        {
+          "componentId": "3173fefe-9995-49d1-a75d-a5caeaaba212",
+          "componentName": "@ms/sp-pages-content-panel-context",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "63d75709-2785-4c91-97ad-489b171397d4",
+          "componentName": "@ms/sp-fluentui-migration-reactdom-render-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "cc2cc925-b5be-41bb-880a-f0f8030c6aff",
+          "componentName": "@ms/odsp-utilities-bundle",
+          "componentVersion": "5.6.353",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "8494e7d7-6b99-47b2-a741-59873e42f16f",
+          "componentName": "@ms/sp-component-utilities",
+          "componentVersion": "12.68.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "0ec74f52-38bc-4a51-ab82-7c91a2b399a2",
+          "componentName": "@ms/sp-fluentui-v9-utilities-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "72ec0651-8a26-441c-87f2-77ec66884ca3",
+          "componentName": "@ms/sp-fluentui-v9-react-button-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "f652a763-4d5f-4a08-aed3-d3377ef835ff",
+          "componentName": "@ms/sp-fluentui-v9-react-menu-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "396bbc17-3d18-4f43-8299-d99720d88e22",
+          "componentName": "@ms/office-ui-fabric-react-bundle",
+          "componentVersion": "1.19.22",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "fab65e60-a04f-4772-874c-10691e4afa4b",
+          "componentName": "@ms/sp-fluentui-migration-tooltip-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "0ad7e31a-8df9-4659-add8-a32c8e40040d",
+          "componentName": "@ms/sp-fluentui-migration-button-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "bf211556-3cf0-412c-9618-a4f0e7069ebf",
+          "componentName": "@ms/sp-heading-level",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
+        },
+        {
+          "componentId": "ffe5c101-373a-4bd2-bebb-13082852bab0",
+          "componentName": "@ms/sp-fluentui-migration-label-bundle",
+          "componentVersion": "0.1.0",
+          "isDirectDependency": false
         }
       ],
       "asyncChunks": {}

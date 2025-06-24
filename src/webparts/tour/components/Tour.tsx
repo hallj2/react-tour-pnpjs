@@ -85,7 +85,6 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
   }
 
   private _openTour = () => {
-    console.log("introjs tour started");
     if (this.state.steps && this.state.steps.length > 0) {
       introJs().setOptions({
         steps: this.state.steps.map(step => ({

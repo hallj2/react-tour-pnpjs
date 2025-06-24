@@ -94,9 +94,10 @@
     }
   }
 
-  .tour-highlight-preview {
+  .tourHighlightPreview {
     outline: 3px solid gold !important;
     outline-offset: -3px;
     transition: outline 0.2s ease;
+    z-index: 9999;
   }
 }

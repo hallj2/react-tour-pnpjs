@@ -35,7 +35,7 @@
     "scriptResources": {
       "tour-web-part": {
         "type": "path",
-        "path": "tour-web-part_72293290483ba56606da.js"
+        "path": "tour-web-part_87731dfd73a9752564f2.js"
       },
       "react": {
         "type": "component",
@@ -57,9 +57,10 @@
         "id": "974a7777-0990-4136-8fa6-95d80114c2e0",
         "version": "1.21.1"
       },
-      "TourWebPartStrings": {
-        "type": "path",
-        "path": "TourWebPartStrings_en-us_386a6a9b21fb6b0ab57ce823dabae27f.js"
+      "@microsoft/sp-property-pane": {
+        "type": "component",
+        "id": "f9e737b7-f0df-4597-ba8c-3060f82380db",
+        "version": "1.21.1"
       },
       "PropertyControlStrings": {
         "type": "localizedPath",
@@ -76,6 +77,10 @@
         "type": "component",
         "id": "73e1dc6c-8441-42cc-ad47-4bd3659f8a3a",
         "version": "1.21.1"
+      },
+      "TourWebPartStrings": {
+        "type": "path",
+        "path": "TourWebPartStrings_en-us_db389c585d71e2458d5b1ddd0bbb1e40.js"
       }
     }
   }

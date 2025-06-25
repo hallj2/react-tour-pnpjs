@@ -1,57 +1,82 @@
 import * as React from 'react';
 import styles from './Tour.module.scss';
-import { ITourProps } from './ITourProps';
-import Tours from 'reactour';
-import { CompoundButton } from 'office-ui-fabric-react';
-import { TourHelper } from './TourHelper';
-import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import introJs from 'intro.js';
 import 'intro.js/introjs.css';
+import { CompoundButton } from 'office-ui-fabric-react';
+import { TourHelper } from './TourHelper';
+import { ITourProps } from './ITourProps';
 
 export interface ITourState {
-  steps: any[];
+  steps: Array<{ selector: string; content: string }>;
   tourDisabled: boolean;
 }
 
 export default class Tour extends React.Component<ITourProps, ITourState> {
   constructor(props: ITourProps) {
     super(props);
-    this.state = {
-      steps: [],
-      tourDisabled: true
-    };
+    this.state = { steps: [], tourDisabled: true };
   }
 
-  public componentDidMount() {
+  public componentDidMount(): void {
     this.initializeTourWithRetry();
   }
 
-  public componentDidUpdate(prevProps: ITourProps) {
-    if (JSON.stringify(this.props.collectionData) !== JSON.stringify(prevProps.collectionData)) {
+  public componentDidUpdate(prevProps: ITourProps): void {
+    if (
+      JSON.stringify(this.props.collectionData) !== JSON.stringify(prevProps.collectionData)
+    ) {
       this.initializeTourWithRetry();
     }
   }
 
-  private initializeTourWithRetry(attempt: number = 0) {
+  private initializeTourWithRetry(attempt = 0): void {
     const MAX_ATTEMPTS = 5;
     const DELAY_MS = 500;
+    const rawSteps = TourHelper.getTourSteps(this.props.collectionData);
 
-    const steps = TourHelper.getTourSteps(this.props.collectionData);
-    const allSelectorsExist = steps.every(
-      step => !!step.selector && document.querySelector(step.selector)
-    );
-
-    if ((steps.length > 0 && allSelectorsExist) || attempt >= MAX_ATTEMPTS) {
+    if (rawSteps.length > 0 || attempt >= MAX_ATTEMPTS) {
       this.setState({
-        steps: steps,
-        tourDisabled: steps.length === 0 || !allSelectorsExist
+        steps: rawSteps.map(s => ({ selector: s.selector, content: s.content })),
+        tourDisabled: rawSteps.length === 0
       });
     } else {
       setTimeout(() => this.initializeTourWithRetry(attempt + 1), DELAY_MS);
     }
   }
 
-  public render(): React.ReactElement<ITourState> {
+  /** Safely resolves a selector to an Element or null */
+  private getElement(selector: string): HTMLElement | null {
+    try {
+      return document.querySelector(selector) as HTMLElement;
+    } catch {
+      return null;
+    }
+  }
+
+  private _openTour = (): void => {
+    const { steps } = this.state;
+    if (steps.length === 0) {
+      return;
+    }
+
+    const introSteps = steps.map(step => {
+      const el = this.getElement(step.selector);
+      return {
+        element: el ?? step.selector,
+        intro: step.content
+      };
+    });
+
+    introJs()
+      .setOptions({ steps: introSteps })
+      .start();
+  };
+
+  private _closeTour = (): void => {
+    introJs().exit(true);
+  };
+
+  public render(): React.ReactElement {
     return (
       <div className={styles.tour}>
         <CompoundButton
@@ -62,37 +87,8 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
           onClick={this._openTour}
           className={styles.tutorialButton}
         />
-        <Tours
-          onRequestClose={this._closeTour}
-          startAt={0}
-          steps={this.state.steps}
-          maskClassName="mask"
-          className={styles.reactTourCustomCss}
-          accentColor={"#5cb7b7"}
-          rounded={5}
-          onAfterOpen={this._disableBody}
-          onBeforeClose={this._enableBody}
-        />
       </div>
     );
-  }
-
-  private _disableBody = target => disableBodyScroll(target);
-  private _enableBody = target => enableBodyScroll(target);
-
-  private _closeTour = () => {
-    introJs().exit(true);
-  }
-
-  private _openTour = () => {
-    if (this.state.steps && this.state.steps.length > 0) {
-      introJs().setOptions({
-        steps: this.state.steps.map(step => ({
-          element: step.selector, // css element selector
-          intro: step.content //tooltip text
-        }))
-      }).start();
-    }
   }
 }
 

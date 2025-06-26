@@ -27,6 +27,7 @@
       }
     }
   ],
+  "disableDeferLoading": true,
   "loaderConfig": {
     "internalModuleBaseUrls": [
       "<!-- PATH TO CDN -->"
@@ -35,7 +36,7 @@
     "scriptResources": {
       "tour-web-part": {
         "type": "path",
-        "path": "tour-web-part_c4d8e513af1871bfce1d.js"
+        "path": "tour-web-part_451f87ad6a91e8870a74.js"
       },
       "react": {
         "type": "component",

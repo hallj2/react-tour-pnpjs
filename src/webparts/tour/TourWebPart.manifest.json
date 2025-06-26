@@ -24,5 +24,6 @@
       "actionValue": "Start page tour",
       "description": "Start page tutorial to discover all the features."
     }
-  }]
+  }],
+  "disableDeferLoading": true
 }

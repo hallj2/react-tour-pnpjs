@@ -85,6 +85,26 @@
     z-index: 9999;
   } 
 
+  :global {
+    body.introjs-disableInteraction,
+    html.introjs-disableInteraction {
+      overflow: auto !important;
+    }
+
+    .introjs-overlay {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% important;
+    }
+
+    .introjs-helperlayer,
+    .introjs-tooltipReferenceLayer {
+      position: fixed !important;
+    }
+  }
+
 /*   :global(.introjs-overlay) {
     background-color: rgba(0,0,0,0.3) !important;
   }

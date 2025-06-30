@@ -22,7 +22,8 @@
     "officeFabricIconFontName": "HintText",
     "properties": {
       "actionValue": "Start page tour",
-      "description": "Start page tutorial to discover all the features."
+      "description": "Start page tutorial to discover all the features.",
+      "dataAutomationId": "contentScrollRegion"
     }
   }],
   "disableDeferLoading": true

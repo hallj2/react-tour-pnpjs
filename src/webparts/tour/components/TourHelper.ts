@@ -13,6 +13,7 @@ export class TourHelper {
             selector: selector,
             content: ele.StepDescription
           });
+
         }
       });
     }

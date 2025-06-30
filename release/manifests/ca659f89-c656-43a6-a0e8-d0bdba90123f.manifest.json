@@ -23,7 +23,8 @@
       "officeFabricIconFontName": "HintText",
       "properties": {
         "actionValue": "Start page tour",
-        "description": "Start page tutorial to discover all the features."
+        "description": "Start page tutorial to discover all the features.",
+        "dataAutomationId": "contentScrollRegion"
       }
     }
   ],
@@ -36,7 +37,7 @@
     "scriptResources": {
       "tour-web-part": {
         "type": "path",
-        "path": "tour-web-part_451f87ad6a91e8870a74.js"
+        "path": "tour-web-part_32ac3d5a8394fbed0725.js"
       },
       "react": {
         "type": "component",
@@ -81,7 +82,7 @@
       },
       "TourWebPartStrings": {
         "type": "path",
-        "path": "TourWebPartStrings_en-us_db389c585d71e2458d5b1ddd0bbb1e40.js"
+        "path": "TourWebPartStrings_en-us_8a46b9742a3b8614438a99acb6e0dd02.js"
       }
     }
   }

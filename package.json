@@ -20,6 +20,7 @@
     "@microsoft/sp-office-ui-fabric-core": "1.21.1",
     "@microsoft/sp-property-pane": "^1.21.1",
     "@microsoft/sp-webpart-base": "^1.21.1",
+    "@microsoft/sp-webpart-workbench": "^1.11.0",
     "@pnp/common": "^1.3.7",
     "@pnp/graph": "^1.3.7",
     "@pnp/logging": "^1.3.7",
@@ -36,6 +37,7 @@
     "office-ui-fabric-react": "^7.204.1",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "smooth-scroll": "^16.1.3",
     "styled-components": "^4.4.1",
     "tslib": "2.8.1"
   },

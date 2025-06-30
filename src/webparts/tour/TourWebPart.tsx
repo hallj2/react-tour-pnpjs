@@ -7,7 +7,8 @@ import {
   PropertyPaneTextField,
   PropertyPaneButton,
   PropertyPaneButtonType,
-  PropertyPaneHorizontalRule
+  PropertyPaneHorizontalRule,
+  PropertyPaneSlider
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
 import { sp, ClientSidePage } from '@pnp/sp';
@@ -100,6 +101,9 @@ export interface ITourWebPartProps {
   description: string;
   collectionData: any[];
   webPartInstanceId: string;
+  preloadTimeout: number;
+  dataAutomationId: string;
+  siteMenuClass: string;
 }
 
 
@@ -119,7 +123,10 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       actionValue: this.properties.actionValue,
       description: this.properties.description,
       collectionData: this.properties.collectionData,
-      webPartInstanceId: this.instanceId
+      webPartInstanceId: this.instanceId,
+      preloadTimeout: this.properties.preloadTimeout,
+      dataAutomationId: this.properties.dataAutomationId,
+      siteMenuClass: this.properties.siteMenuClass
     });
     ReactDom.render(element, this.domElement);
   }
@@ -205,6 +212,15 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
             {
               groupName: strings.BasicGroupName,
               groupFields: [
+                PropertyPaneSlider('preloadTimeout', {
+                  label: 'Preload elements timeout (ms)',
+                  min: 0,
+                  max: 5000,
+                  step: 50,
+                  showValue: true
+                }),
+                PropertyPaneTextField('dataAutomationId', { label: strings.DataAutomationIdLabel}),
+                PropertyPaneTextField('siteMenuClass', { label: strings.SiteMenuClassLabel}),
                 PropertyPaneTextField('actionValue', { label: strings.ActionValueFieldLabel }),
                 PropertyPaneTextField('description', { label: strings.DescriptionFieldLabel }),
                 PropertyPaneHorizontalRule(),

@@ -4,6 +4,8 @@ declare interface ITourWebPartStrings {
   DescriptionFieldLabel: string;
   ActionValueFieldLabel: string;
   PropertyPaneActionValue: string;
+  DataAutomationIdLabel: string;
+  SiteMenuClassLabel: string;
 }
 
 declare module 'TourWebPartStrings' {

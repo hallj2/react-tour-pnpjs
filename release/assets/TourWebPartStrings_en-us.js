@@ -4,5 +4,7 @@ define([], function() {
     "BasicGroupName": "Tour Step Configuration",
     "DescriptionFieldLabel": "Tour Description",
     "ActionValueFieldLabel":"Tour Start Label",
+    "DataAutomationIdLabel":"Selected Data Automation ID",
+    "SiteMenuClassLabel":"Parent class of the site level menu"
   }
 });

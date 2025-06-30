@@ -5,6 +5,7 @@ import 'intro.js/introjs.css';
 import { CompoundButton } from 'office-ui-fabric-react';
 import { TourHelper } from './TourHelper';
 import { ITourProps } from './ITourProps';
+import SmoothScroll from 'smooth-scroll';
 
 export interface ITourState {
   steps: Array<{ selector: string; content: string }>;
@@ -56,20 +57,74 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     }
   }
 
+  private async scrollDownToElementAtBottom(): Promise<boolean> {
+    const scrollContainer = document.querySelector<HTMLElement>(
+        `[data-automation-id="${this.props.dataAutomationId}"]`
+      );
+
+    const bottomElement = document.querySelector<HTMLElement>(
+      `[id^="vpc_Page.SiteFooter.internal"]`
+    );
+
+    scrollContainer.style.overflowX = 'auto';
+
+    return new Promise((resolve, reject) => {
+        if (!bottomElement) {
+            reject(new Error('Bottom element not found.'));
+            return;
+        }
+
+        // Scroll to the bottom element
+        bottomElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+        setTimeout(() => {
+            resolve(true);
+        }, 500); 
+    });
+  }
+  
+  private async scrollBackToTop(): Promise<boolean> {
+    const scrollContainer = document.querySelector<HTMLElement>(
+        `[data-automation-id="${this.props.dataAutomationId}"]`
+      );
+
+    scrollContainer.style.overflowX = 'auto';
+
+    return new Promise((resolve, reject) => {
+        // Scroll to the bottom element
+        scrollContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        setTimeout(() => {
+            resolve(true);
+        }, 500); 
+    });
+  }
+
   /**
    * Open the tour using Intro.js; relies on disableDeferLoading in manifest to have all content loaded
    */
-  private _openTour = (): void => {
+  private _openTour = async (): Promise<void> => {
+    try {
+        await this.scrollDownToElementAtBottom();
+        await this.scrollBackToTop();
+    } catch (error) {
+      console.error('Error during pre-scroll:', error);
+      return;
+    }
+
     const { steps } = this.state;
     if (steps.length === 0) {
       return;
     }
 
+    // 1) Build the Intro.js steps as before
     const introSteps = steps.map(step => {
       const container = this.getElement(step.selector);
       let target: HTMLElement | string = step.selector;
       if (container) {
-        const inner = container.querySelector('.ms-webpart-titleText, .ms-webpart-body') as HTMLElement;
+        const inner = container.querySelector(
+          '.ms-webpart-titleText, .ms-webpart-body'
+        ) as HTMLElement;
         target = inner || container;
       }
       return {
@@ -78,16 +133,58 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
       };
     });
 
-    introJs()
-      .setOptions({ steps: introSteps })
-      .onbeforechange((target: Element): boolean => {
-        if (target instanceof HTMLElement) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return true;
-      })
-      .start();
-  };
+    // 2) Create the tour instance
+    const intro = introJs().setOptions({ steps: introSteps, scrollToElement: false });
+
+    // 3) Hook into each step change to scroll it into view
+    intro.onbeforechange((targetEl: HTMLElement) => {
+      // Try to scroll within the SPFx container first
+      const scrollContainer = document.querySelector<HTMLElement>(
+        `[data-automation-id="${this.props.dataAutomationId}"]`
+      ); //mainScrollRegionInnerContent
+
+              // Center the element vertically in that container
+        const top =
+          targetEl.offsetTop -
+          scrollContainer.clientHeight / 2 +
+          targetEl.clientHeight / 2;
+        scrollContainer.scrollTop = top;
+        targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+/*       if (scrollContainer) {
+        // Center the element vertically in that container
+        const top =
+          targetEl.offsetTop -
+          scrollContainer.clientHeight / 2 +
+          targetEl.clientHeight / 2;
+        scrollContainer.scrollTop = top;
+        targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } else {
+        // Fallback to window scroll
+        targetEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      } */
+
+      // Recompute the overlay/spotlight
+      //setTimeout(() => intro.refresh(), this.props.preloadTimeout);
+
+      return true;
+    });
+
+    intro.onafterchange((targetEl: HTMLElement) => {
+      const canvas = document.querySelector<HTMLElement>('.CanvasComponent');
+      if (canvas) {
+        canvas.classList.add('forceTableReflow', 'forceVerticalSectionReflow');
+        void canvas.offsetHeight;
+        canvas.classList.remove('forceTableReflow', 'forceVerticalSectionReflow');
+      }
+      
+      // Recompute the overlay/spotlight
+      setTimeout(() => intro.refresh(), this.props.preloadTimeout);
+    });
+
+    // 4) Finally, start the tour one time
+    intro.start();
+};
 
   private _closeTour = (): void => {
     introJs().exit(true);
@@ -108,3 +205,6 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     );
   }
 }
+
+
+//https://stlouiscountymn.sharepoint.com/sites/stagingemployee2/?debug=true&loadSPFX=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/build/manifests.jsgu

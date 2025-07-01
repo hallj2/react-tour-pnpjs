@@ -48,7 +48,6 @@ class WebPartDropdown extends React.Component<IWebPartDropdownProps, IWebPartDro
     Promise.all(
       this.props.webpartList.map(async wp => {
         let label = ""; // `sec[${wp.section}] col[${wp.column}]`;
-        console.log("Web Part List item: ", wp);
         const isWebPart = wp.section !== undefined && wp.column !== undefined;
         if (isWebPart) {
           label = `sec[${wp.section}] col[${wp.column}]`;
@@ -110,7 +109,6 @@ export interface ITourWebPartProps {
   webPartInstanceId: string;
   preloadTimeout: number;
   dataAutomationId: string;
-  siteMenuClass: string;
 }
 
 export interface TourElementData {
@@ -143,8 +141,7 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       collectionData: this.properties.collectionData,
       webPartInstanceId: this.instanceId,
       preloadTimeout: this.properties.preloadTimeout,
-      dataAutomationId: this.properties.dataAutomationId,
-      siteMenuClass: this.properties.siteMenuClass
+      dataAutomationId: this.properties.dataAutomationId
     });
     ReactDom.render(element, this.domElement);
   }
@@ -183,7 +180,6 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
 
 
   public async GetAllWebpart(): Promise<{ section?: number; column?: number; key: string; title: string, selector?: string }[]> {
-    console.log("Getting web part list");
     const file = sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
     const page = await ClientSidePage.fromFile(file);
     const wpData: TourElementData[] = [];
@@ -199,14 +195,10 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       });
     });
 
-    console.log("Filled web part data");
-    console.log(wpData);
 
     // Get header navigation items
     const navItems = document.querySelectorAll('span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link');
-    console.log("Navigation items found: ", navItems);
     navItems.forEach((linkElement: HTMLAnchorElement) => { // Cast to HTMLAnchorElement to access href
-      console.log("Navigation anchor: ", linkElement);
       const linkTextElement = linkElement.querySelector('.ms-HorizontalNavItem-linkText');
       const linkText = linkTextElement ? linkTextElement.textContent?.trim() : null;
       const href = linkElement.getAttribute('href'); // Get the href attribute value
@@ -227,8 +219,6 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       }
     });
       
-    console.log("Filled navigation element data");
-    console.log(wpData);
 
     return wpData;
   }

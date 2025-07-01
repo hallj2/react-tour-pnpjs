@@ -23,12 +23,13 @@ import { ITourProps } from './components/ITourProps';
 interface IWebPartDropdownProps {
   value: string;
   fieldId: string;
-  webpartList: { section: number; column: number; key: string; title: string }[];
+  webpartList: TourElementData[];
   onUpdate: (fieldId: string, value: string) => void;
   waitForElement: (selector: string, maxAttempts?: number, delayMs?: number) => Promise<HTMLElement | null>;
   style?: React.CSSProperties;
   className?: string;
 }
+
 interface IWebPartDropdownState {
   loading: boolean;
   options: { key: string; text: string }[];
@@ -46,8 +47,14 @@ class WebPartDropdown extends React.Component<IWebPartDropdownProps, IWebPartDro
     // Build dropdown labels, falling back to supplied title if DOM lookup fails
     Promise.all(
       this.props.webpartList.map(async wp => {
-        let label = `sec[${wp.section}] col[${wp.column}]`;
-        const selector = `[data-sp-feature-instance-id="${wp.key}"]`;
+        let label = ""; // `sec[${wp.section}] col[${wp.column}]`;
+        console.log("Web Part List item: ", wp);
+        const isWebPart = wp.section !== undefined && wp.column !== undefined;
+        if (isWebPart) {
+          label = `sec[${wp.section}] col[${wp.column}]`;
+        }
+
+        const selector = wp.selector ? wp.selector : `[data-sp-feature-instance-id="${wp.key}"]`;
         const el = await this.props.waitForElement(selector, 20, 100);
         if (el) {
           const featureTag = el.getAttribute('data-sp-feature-tag')?.trim();
@@ -99,17 +106,28 @@ class WebPartDropdown extends React.Component<IWebPartDropdownProps, IWebPartDro
 export interface ITourWebPartProps {
   actionValue: string;
   description: string;
-  collectionData: any[];
+  collectionData: TourElementData[];
   webPartInstanceId: string;
   preloadTimeout: number;
   dataAutomationId: string;
   siteMenuClass: string;
 }
 
+export interface TourElementData {
+  section?: number;
+  column?: number;
+  key: string;
+  title: string;
+  selector?: string;
+  intro?: string;
+  position?: string;
+  id?: string
+}
+
 
 export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps> {
   private loadIndicator = true;
-  private webpartList: { section: number; column: number; key: string; title: string }[] = [];
+  private webpartList: TourElementData[] = [];
 
 
   public async onInit(): Promise<void> {
@@ -164,10 +182,11 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
   }
 
 
-  public async GetAllWebpart(): Promise<{ section: number; column: number; key: string; title: string }[]> {
+  public async GetAllWebpart(): Promise<{ section?: number; column?: number; key: string; title: string, selector?: string }[]> {
+    console.log("Getting web part list");
     const file = sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
     const page = await ClientSidePage.fromFile(file);
-    const wpData: { section: number; column: number; key: string; title: string }[] = [];
+    const wpData: TourElementData[] = [];
 
 
     page.sections.forEach(section => {
@@ -180,6 +199,36 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       });
     });
 
+    console.log("Filled web part data");
+    console.log(wpData);
+
+    // Get header navigation items
+    const navItems = document.querySelectorAll('span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link');
+    console.log("Navigation items found: ", navItems);
+    navItems.forEach((linkElement: HTMLAnchorElement) => { // Cast to HTMLAnchorElement to access href
+      console.log("Navigation anchor: ", linkElement);
+      const linkTextElement = linkElement.querySelector('.ms-HorizontalNavItem-linkText');
+      const linkText = linkTextElement ? linkTextElement.textContent?.trim() : null;
+      const href = linkElement.getAttribute('href'); // Get the href attribute value
+
+      if (linkText && href) {
+        // Use the href value to create a unique key (e.g., lowercase, replace non-alphanumeric chars)
+        const uniqueKey = `nav-${href.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+
+        // Create a selector based on the href attribute value
+        const selector = `a[href="${href}"]`; // Exact match selector
+
+        wpData.push({
+          key: uniqueKey,
+          title: linkText,
+          selector: selector,
+          // section and column are omitted for header items
+        });
+      }
+    });
+      
+    console.log("Filled navigation element data");
+    console.log(wpData);
 
     return wpData;
   }
@@ -220,7 +269,6 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
                   showValue: true
                 }),
                 PropertyPaneTextField('dataAutomationId', { label: strings.DataAutomationIdLabel}),
-                PropertyPaneTextField('siteMenuClass', { label: strings.SiteMenuClassLabel}),
                 PropertyPaneTextField('actionValue', { label: strings.ActionValueFieldLabel }),
                 PropertyPaneTextField('description', { label: strings.DescriptionFieldLabel }),
                 PropertyPaneHorizontalRule(),

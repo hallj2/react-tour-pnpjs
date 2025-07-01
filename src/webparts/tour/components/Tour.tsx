@@ -53,8 +53,6 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
       return pa - pb;
     });
 
-    console.log("Sorted settings: ");
-    console.log(sortedSettings);
 
     const rawSteps = TourHelper.getTourSteps(sortedSettings);
 
@@ -86,11 +84,13 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
       `[id^="vpc_Page.SiteFooter.internal"]`
     );
 
-    scrollContainer.style.overflowX = 'auto';
+    if (scrollContainer) {
+      scrollContainer.style.overflowX = 'auto';
+    }
 
     return new Promise((resolve, reject) => {
-        if (!bottomElement) {
-            reject(new Error('Bottom element not found.'));
+        if (!scrollContainer || !bottomElement) {
+            reject(new Error('Scroll or bottom element not found.'));
             return;
         }
 
@@ -108,9 +108,16 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
         `[data-automation-id="${this.props.dataAutomationId}"]`
       );
 
-    scrollContainer.style.overflowX = 'auto';
+    if (scrollContainer) {
+      scrollContainer.style.overflowX = 'auto';
+    }
 
     return new Promise((resolve, reject) => {
+        if (!scrollContainer) {
+            reject(new Error('Scroll container not found.'));
+            return;
+        }
+
         // Scroll to the bottom element
         scrollContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -209,6 +216,3 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     );
   }
 }
-
-
-//https://stlouiscountymn.sharepoint.com/sites/stagingemployee2/?debug=true&loadSPFX=true&noredir=true&debugManifestsFile=https://localhost:4321/temp/build/manifests.jsgu

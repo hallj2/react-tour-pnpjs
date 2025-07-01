@@ -25,41 +25,4 @@ export class TourHelper {
     return result;
   }
 
-  /* public static getStaticSiteHeaderTourSteps(): any[] {
-    const staticSteps = [
-      {
-        // Target the 'Home' link
-        element: 'span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link:contains("Home")',
-        intro: 'Click here to go back to the home page.',
-        position: 'bottom',
-        title: 'Home Link',
-      },
-      {
-        // Target the 'All Documents' link
-        element: 'span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link:contains("All Documents")',
-        intro: 'This link takes you to the document library where you can access all the documents on this site.',
-        position: 'bottom',
-        title: 'All Documents Link',
-      },
-      {
-        // Target the 'Forms' link
-        element: 'span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link:contains("Forms")',
-        intro: 'Find various forms related to your tasks and processes here.',
-        position: 'bottom',
-        title: 'Forms Link',
-      },
-      {
-        // Target the 'Policies' link
-        element: 'span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link:contains("Policies")',
-        intro: 'Access the company policies and guidelines through this link.',
-        position: 'bottom',
-        title: 'Policies Link',
-      },
-      // Add more static steps for other header items as needed
-    ];
-
-    return staticSteps;
-  } */
-
-
 }

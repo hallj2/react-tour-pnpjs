@@ -195,13 +195,30 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
       });
     });
 
+
     // Get header navigation items
-    const siteNav = await sp.web.navigation.topNavigationBar.get();
-    siteNav.forEach(node => {
-      const key = `nav-${node.url.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-      const selector = `a[href="${node.Url}"]`;
-      wpData.push({key, title: node.Title, selector});
-    })     
+    const navItems = document.querySelectorAll('span.ms-HorizontalNavItem[data-automationid="HorizontalNav-link"] a.ms-HorizontalNavItem-link');
+    navItems.forEach((linkElement: HTMLAnchorElement) => { // Cast to HTMLAnchorElement to access href
+      const linkTextElement = linkElement.querySelector('.ms-HorizontalNavItem-linkText');
+      const linkText = linkTextElement ? linkTextElement.textContent?.trim() : null;
+      const href = linkElement.getAttribute('href'); // Get the href attribute value
+
+      if (linkText && href) {
+        // Use the href value to create a unique key (e.g., lowercase, replace non-alphanumeric chars)
+        const uniqueKey = `nav-${href.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+
+        // Create a selector based on the href attribute value
+        const selector = `a[href="${href}"]`; // Exact match selector
+
+        wpData.push({
+          key: uniqueKey,
+          title: linkText,
+          selector: selector,
+          // section and column are omitted for header items
+        });
+      }
+    });
+      
 
     return wpData;
   }

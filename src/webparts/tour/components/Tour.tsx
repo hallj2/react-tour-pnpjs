@@ -48,8 +48,8 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     }
 
     const sortedSettings = [...this.props.collectionData].sort((a, b) => {
-      const pa = Number(a.Position) || 0;
-      const pb = Number(b.Position) || 0;
+      const pa = Number(a.position) || 0;
+      const pb = Number(b.position) || 0;
       return pa - pb;
     });
 

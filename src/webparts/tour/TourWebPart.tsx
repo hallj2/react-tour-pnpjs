@@ -11,15 +11,25 @@ import {
   PropertyPaneSlider
 } from '@microsoft/sp-property-pane';
 import { PropertyFieldCollectionData, CustomCollectionFieldType } from '@pnp/spfx-property-controls/lib/PropertyFieldCollectionData';
-import { sp, ClientSidePage } from '@pnp/sp';
-
+//import { sp, ClientSidePage, NavigationNode } from '@pnp/sp';
+import { spfi, SPFI, SPFx } from "@pnp/sp";
+import "@pnp/sp/webs";
+import "@pnp/sp/sites";
+import "@pnp/sp/files";
+import "@pnp/sp/navigation";
+import "@pnp/sp/hubsites/web"; 
+import type { NavigationNode } from "@pnp/sp/navigation";
+import "@pnp/sp/clientside-pages/web";
+import "@pnp/sp/files/web";
+import { ClientsidePageFromFile, IClientsidePage } from "@pnp/sp/clientside-pages";
 
 import * as strings from 'TourWebPartStrings';
 import Tour from './components/Tour';
 import { ITourProps } from './components/ITourProps';
+import { WebPartContext } from '@microsoft/sp-webpart-base'; 
+import { IHubSite, IHubSiteWebData, IHubSiteInfo } from "@pnp/sp/hubsites";
 
-
-// Dropdown props now include title as fallback
+// Dropdown props include title as fallback
 interface IWebPartDropdownProps {
   value: string;
   fieldId: string;
@@ -28,53 +38,66 @@ interface IWebPartDropdownProps {
   waitForElement: (selector: string, maxAttempts?: number, delayMs?: number) => Promise<HTMLElement | null>;
   style?: React.CSSProperties;
   className?: string;
+  options: ITourStepOption[];
 }
 
 interface IWebPartDropdownState {
   loading: boolean;
-  options: { key: string; text: string }[];
+  options: ITourStepOption[]; // { key: string; text: string }[];
 }
 
+interface INavigationNode {
+  Title: string;
+  Url: string;
+}
+
+export interface ITourStepOption {
+  key: string; 
+  text: string;
+  elementType: 'webpart' | 'navigation';
+}
+
+export interface ITourWebPartProps {
+  actionValue: string;
+  description: string;
+  collectionData: TourElementData[];
+  webPartInstanceId: string;
+  preloadTimeout: number;
+  dataAutomationId: string;
+}
+
+export interface TourElementData {
+  section?: number;
+  column?: number;
+  key: string;
+  title: string;
+  selector?: string;
+  intro?: string;
+  position?: string;
+  id?: string
+  elementType: 'webpart' | 'navigation';
+  sequence?: number;
+}
 
 class WebPartDropdown extends React.Component<IWebPartDropdownProps, IWebPartDropdownState> {
+
   constructor(props: IWebPartDropdownProps) {
     super(props);
-    this.state = { loading: true, options: [] };
+    this.state = {
+      loading: false, 
+      options: props.options || [] 
+    };
   }
 
-
-  public componentDidMount(): void {
-    // Build dropdown labels, falling back to supplied title if DOM lookup fails
-    Promise.all(
-      this.props.webpartList.map(async wp => {
-        let label = ""; // `sec[${wp.section}] col[${wp.column}]`;
-        const isWebPart = wp.section !== undefined && wp.column !== undefined;
-        if (isWebPart) {
-          label = `sec[${wp.section}] col[${wp.column}]`;
-        }
-
-        const selector = wp.selector ? wp.selector : `[data-sp-feature-instance-id="${wp.key}"]`;
-        const el = await this.props.waitForElement(selector, 20, 100);
-        if (el) {
-          const featureTag = el.getAttribute('data-sp-feature-tag')?.trim();
-          const heading = el.querySelector('h1,h2,h3,h4,h5,h6,.ms-webpart-titleText') as HTMLElement;
-          const headingText = heading?.textContent?.trim()?.substring(0, 80);
-          const fallback = el.textContent?.trim()?.substring(0, 80);
-          const text = featureTag || headingText || fallback;
-          label += ' – ' + (text || wp.title || 'Untitled Web Part');
-        } else {
-          // Element not rendered yet, use the title value
-          label += ' – ' + (wp.title || 'Untitled Web Part');
-        }
-        return { key: wp.key, text: label };
-      })
-    ).then(options => {
-      options.sort((a, b) => a.text.localeCompare(b.text));
-      this.setState({ options, loading: false });
-    });
+  public async componentDidMount(): Promise<void> {
   }
 
-
+  public componentDidUpdate(prevProps: Readonly<IWebPartDropdownProps>, prevState: Readonly<IWebPartDropdownState>, snapshot?: any): void {
+      if (prevProps.options !== this.props.options) {
+      this.setState({ options: this.props.options || [] });
+    }
+  }
+  
   public render(): React.ReactElement {
     const { className, style } = this.props;
     if (this.state.loading) {
@@ -101,36 +124,17 @@ class WebPartDropdown extends React.Component<IWebPartDropdownProps, IWebPartDro
   }
 }
 
-
-export interface ITourWebPartProps {
-  actionValue: string;
-  description: string;
-  collectionData: TourElementData[];
-  webPartInstanceId: string;
-  preloadTimeout: number;
-  dataAutomationId: string;
-}
-
-export interface TourElementData {
-  section?: number;
-  column?: number;
-  key: string;
-  title: string;
-  selector?: string;
-  intro?: string;
-  position?: string;
-  id?: string
-}
-
-
 export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps> {
   private loadIndicator = true;
   private webpartList: TourElementData[] = [];
-
+  private _pnpInitialized: boolean = false;
+  private _sp?: ReturnType<typeof spfi>;
+  private _tourStepOptions: ITourStepOption[] = [];
 
   public async onInit(): Promise<void> {
     await super.onInit();
-    sp.setup({ spfxContext: this.context });
+    this._sp = spfi().using(SPFx(this.context));
+    this._pnpInitialized = true;
   }
 
 
@@ -179,9 +183,9 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
   }
 
 
-  public async GetAllWebpart(): Promise<{ section?: number; column?: number; key: string; title: string, selector?: string }[]> {
-    const file = sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
-    const page = await ClientSidePage.fromFile(file);
+  public async GetAllWebpart(): Promise<{ section?: number; column?: number; key: string; title: string, selector?: string, elementType: 'webpart' | 'navigation' }[]> {
+    const file = this._sp.web.getFileByServerRelativePath(this.context.pageContext.site.serverRequestPath);
+    const page = await ClientsidePageFromFile(file);
     const wpData: TourElementData[] = [];
 
 
@@ -190,32 +194,112 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
         column.controls.forEach(control => {
           const instanceId = control.data.webPartData?.instanceId || control.data.id;
           const title = control.data.webPartData?.title?.trim() || 'Untitled Web Part';
-          wpData.push({ section: section.order, column: column.order, key: instanceId, title });
+          wpData.push({ section: section.order, column: column.order, key: instanceId, title, elementType: 'webpart' });
         });
       });
     });
 
-    // Get header navigation items
-    const siteNav = await sp.web.navigation.topNavigationBar.get();
-    siteNav.forEach(node => {
-      const key = `nav-${node.url.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-      const selector = `a[href="${node.Url}"]`;
-      wpData.push({key, title: node.Title, selector});
-    })     
-
     return wpData;
+  }
+  
+   private async _loadWebPartOptions(): Promise<ITourStepOption[]> {
+    // Access webpartList directly from the class member
+    // You might also call GetAllWebpart() here and then map its results.
+    const wpData: TourElementData[] = await this.GetAllWebpart(); // Assuming GetAllWebpart returns TourElementData[]
+
+    return Promise.all(
+      wpData.map(async wp => { // Iterate over the wpData obtained from GetAllWebpart()
+        let label = "";
+        const isWebPart = wp.section !== undefined && wp.column !== undefined;
+        if (isWebPart) {
+          label = `Sec[${wp.section}] Col[${wp.column}]`;
+        }
+
+        const selector = wp.selector ? wp.selector : `[data-sp-feature-instance-id="${wp.key}"]`;
+        // If waitForElement is a method of the TourWebPart class
+        const el = await this.waitForElement(selector, 20, 100); 
+
+        if (el) {
+          const featureTag = el.getAttribute('data-sp-feature-tag')?.trim();
+          const heading = el.querySelector('h1,h2,h3,h4,h5,h6,.ms-webpart-titleText') as HTMLElement;
+          const headingText = heading?.textContent?.trim()?.substring(0, 80);
+          const fallback = el.textContent?.trim()?.substring(0, 80);
+          const text = featureTag || headingText || fallback;
+          label += ' – ' + (text || wp.title || 'Untitled Web Part');
+        } else {
+          label += ' – ' + (wp.title || 'Untitled Web Part');
+        }
+        return { key: `webPart:${wp.key}`, text: label, elementType: 'webpart' };
+      })
+    );
+  }
+
+ private async _loadNavigationOptions(): Promise<ITourStepOption[]> {
+    const options: ITourStepOption[] = [];
+    if (!this._sp) {
+      console.error("PnP JS (this._sp) is not initialized for _loadNavigationOptions.");
+      return [];
+    }
+
+    // Fetch Site Navigation
+    try {
+        const siteNavNodes: INavigationNode[] = await this._sp.web.navigation.topNavigationBar();
+        siteNavNodes.forEach(node => {
+            options.push({ key: `siteNav:${node.Url}`, text: `Site Nav: ${node.Title}`, elementType: 'navigation' });
+        });
+    } catch (error) {
+        console.error('Error fetching site navigation:', error);
+    }
+
+    // Fetch Hub Navigation (if a hub site is associated)
+    try {
+        // Use IHubSiteWebData as the type for hubsiteInfo
+        const hubsiteInfo: Partial<IHubSiteWebData> = await this._sp.web.hubSiteData();
+        // Check for HubSiteId, which is the correct property name for the ID in IHubSiteWebData
+        if (hubsiteInfo && hubsiteInfo.parentHubSiteId) { // Check if associated with a hub
+            const hubSiteUrl = hubsiteInfo.url; // This property should be present if a HubSiteId exists
+            if (hubSiteUrl) { // Ensure hubSiteUrl is defined before using
+                // Create a new PnP JS instance for the hub site's URL
+                // This is crucial to query the hub site's navigation
+                const hubSp = spfi(hubSiteUrl).using(SPFx(this.context)); // Use this.context
+                const hubNavNodes: INavigationNode[] = await hubSp.web.navigation.topNavigationBar();
+
+                hubNavNodes.forEach(node => {
+                    options.push({ key: `hubNav:${node.Url}`, text: `Hub Nav: ${node.Title}`, elementType: 'navigation' });
+                });
+            }
+        }
+    } catch (error) {
+      console.error('Error fetching hub site info or hub navigation:', error);
+    }
+    return options;
+  }
+
+  private async _loadAllTourStepOptions(): Promise<void> {
+    const webPartOptions: ITourStepOption[] = await this._loadWebPartOptions(); // Assuming this is defined
+    const navigationOptions: ITourStepOption[] = await this._loadNavigationOptions(); // Assuming this is defined
+
+    const combinedOptions = [...webPartOptions, ...navigationOptions];
+    combinedOptions.sort((a, b) => a.text.localeCompare(b.text));
+
+    this._tourStepOptions = combinedOptions; // Update the member property
+    this.context.propertyPane.refresh(); // Refresh the property pane to show updated options.
   }
 
 
-  protected onPropertyPaneConfigurationStart(): void {
+  protected async onPropertyPaneConfigurationStart(): Promise<void> {
     this.loadIndicator = true;
-    this.GetAllWebpart().then(res => {
-      // filter out duplicates
-      const unique = [...new Map(res.map(wp => [wp.key, wp])).values()];
-      this.webpartList = unique;
-      this.loadIndicator = false;
-      this.context.propertyPane.refresh();
-    });
+    this.context.propertyPane.refresh();
+
+    try {
+      await this._loadAllTourStepOptions(); 
+    } catch (error) {
+      console.error("Error loading tour step options in onPropertyPaneConfigurationStart:", error);
+      this._tourStepOptions = []; // Clear options on error
+    } finally {
+      this.loadIndicator = false; // Hide loading indicator
+      this.context.propertyPane.refresh(); // Refresh to show the dropdowns with options (or empty)
+    }
   }
 
 
@@ -257,40 +341,40 @@ export default class TourWebPart extends BaseClientSideWebPart<ITourWebPartProps
                   panelDescription: 'Add one or more steps to guide the user through this page.  Select a web part from the dropdown list, type in a description of what the web part is for, and enter a value to indicate the sequence it should appear in the tour.  Use the "+" icon to add additional tour steps.',
                   manageBtnLabel: 'Configure tour steps',
                   value: this.properties.collectionData,
-                  fields: [
+                  fields:  [ 
                     {
-                      id: 'WebPart',
-                      title: 'Target Web Part',
-                      type: CustomCollectionFieldType.custom,
-                      onCustomRender: (field, value, onUpdate) => {
-                        return (<WebPartDropdown
-                                style = {{width: '40%', height: '60px'}}
-                                value = {value}
-                                fieldId = {field.id}
-                                webpartList={this.webpartList}
-                                onUpdate={onUpdate}
-                                waitForElement={this.waitForElement.bind(this)}
-                                />
-                        );
-                      },
-                      required: true
+                      id: 'key', // The property name in TourElementData that will store the selected key (e.g., 'webPart:someID', 'siteNav:url')
+                      title: 'Select Target',
+                      type: CustomCollectionFieldType.dropdown,
+                      options: this._tourStepOptions, // <--- Use the combined and loaded options here
+                      required: true,
                     },
                     {
-                      id: 'StepDescription',
-                      title: 'Step Description',
-                      type: CustomCollectionFieldType.custom,
-                      onCustomRender: (field, value, onUpdate, item, itemId) => {
-                        return (<textarea 
-                                style = {{width: '60%', height: '60px'}}
-                                key = {itemId}
-                                value = {value}
-                                onChange = {(e: React.FormEvent<HTMLTextAreaElement>) => onUpdate(field.id, e.currentTarget.value)}
-                                />
-                        );
-                      }
+                      id: 'intro', // This will store the description for the tour step (as per TourElementData)
+                      title: 'Description',
+                      type: CustomCollectionFieldType.string,
+                      required: true,
                     },
-                    { id: 'Position', title: 'Position', type: CustomCollectionFieldType.number, required: true },
-                    { id: 'Enabled', title: 'Enabled', type: CustomCollectionFieldType.boolean, defaultValue: true }
+                    {
+                      id: 'sequence', // For specifying the order of tour steps (as per TourElementData)
+                      title: 'Sequence',
+                      type: CustomCollectionFieldType.number,
+                      required: true,
+                      defaultValue: 0,
+                    },
+                    {
+                        id: 'position', // If your tour library needs a position (as per TourElementData)
+                        title: 'Position',
+                        type: CustomCollectionFieldType.dropdown,
+                        options: [
+                            { key: 'top', text: 'Top' },
+                            { key: 'right', text: 'Right' },
+                            { key: 'bottom', text: 'Bottom' },
+                            { key: 'left', text: 'Left' },
+                            { key: 'auto', text: 'Auto' },
+                        ],
+                        defaultValue: 'auto'
+                    }
                   ],
                   disabled: false
                 })

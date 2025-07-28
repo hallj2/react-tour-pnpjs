@@ -7,7 +7,7 @@ import { TourHelper } from './TourHelper';
 import { ITourProps } from './ITourProps';
 
 export interface ITourState {
-  steps: Array<{ selector: string; content: string }>;
+  steps: Array<{ id?: string; selector?: string; url?: string; content: string; position?: string; elementType?: 'webpart' | 'navigation' }>; 
   tourDisabled: boolean;
 }
 
@@ -37,7 +37,7 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     }
   }
 
-  private initializeTourWithRetry(attempt = 0): void {
+  private async initializeTourWithRetry(attempt = 0): Promise<void> {
     const MAX_ATTEMPTS = 5;
     const DELAY_MS = 500;
 
@@ -48,21 +48,32 @@ export default class Tour extends React.Component<ITourProps, ITourState> {
     }
 
     const sortedSettings = [...this.props.collectionData].sort((a, b) => {
-      const pa = Number(a.Position) || 0;
-      const pb = Number(b.Position) || 0;
+      const pa = Number(a.sequence) || 0;
+      const pb = Number(b.sequence) || 0;
       return pa - pb;
     });
 
+    console.log("sortedSettings: ", sortedSettings)
+
 
     const rawSteps = TourHelper.getTourSteps(sortedSettings);
-
-    if (rawSteps.length > 0 || attempt >= MAX_ATTEMPTS) {
-      this.setState({
-        steps: rawSteps.map(s => ({ selector: s.selector, content: s.content })),
-        tourDisabled: rawSteps.length === 0
-      });
+    console.log("rawSteps: ", rawSteps);
+    if (rawSteps || attempt >= MAX_ATTEMPTS) {
+      // If all targets are ready OR max attempts reached, proceed to initialize the tour
+      if (rawSteps.length > 0) {
+        this.setState({
+          steps: rawSteps, 
+          tourDisabled: false
+        });
+        console.log("Tour initialized successfully with all targets found.");
+      } else {
+        this.setState({ steps: [], tourDisabled: true });
+        console.warn("No tour steps defined, disabling tour.");
+      }
     } else {
+      // Targets not ready, retry after delay
       setTimeout(() => this.initializeTourWithRetry(attempt + 1), DELAY_MS);
+      console.log(`Retrying tour initialization (attempt ${attempt + 1}/${MAX_ATTEMPTS})...`);
     }
   }
 

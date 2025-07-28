@@ -25,7 +25,7 @@
     "@pnp/graph": "^1.3.7",
     "@pnp/logging": "^1.3.7",
     "@pnp/odata": "^1.3.7",
-    "@pnp/sp": "^1.3.7",
+    "@pnp/sp": "^4.14.0",
     "@pnp/spfx-property-controls": "1.16.0",
     "@swc/helpers": "0.5.17",
     "@types/es6-promise": "0.0.33",
